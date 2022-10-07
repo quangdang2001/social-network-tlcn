@@ -11,4 +11,7 @@ import java.util.List;
 
 @Repository
 public interface PostRepo extends JpaRepository<Post, Long> {
+    List<Post> findAllByUsersOrderByCreateTimeDesc(Users user, Pageable pageable);
+    List<Post> findAllByUsersInOrderByCreateTimeDesc(List<Users> usersId, Pageable pageable);
+    List<Post> findAllByCountReportedGreaterThan(Integer num);
 }

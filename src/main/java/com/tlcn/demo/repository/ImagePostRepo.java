@@ -10,5 +10,5 @@ import java.util.List;
 
 @Repository
 public interface ImagePostRepo extends JpaRepository<ImagePost,Long> {
-
+    List<ImagePost> findAllByPost(Post post);
 }
