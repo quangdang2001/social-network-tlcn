@@ -1,6 +1,5 @@
 package com.tlcn.demo.dto;
 
-
 import com.tlcn.demo.model.ImagePost;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
