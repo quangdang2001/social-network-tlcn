@@ -10,6 +10,7 @@ import com.tlcn.demo.model.Users;
 import com.tlcn.demo.model.VerificationToken;
 import com.tlcn.demo.repository.UserRepo;
 import com.tlcn.demo.repository.VerificationTokenRepo;
+import com.tlcn.demo.service.Cloudinary.CloudinaryUpload;
 import com.tlcn.demo.service.UserService;
 import com.tlcn.demo.service.auth.UserDetailIplm;
 import com.tlcn.demo.util.Convert;
@@ -46,7 +47,7 @@ public class UserServiceIplm implements UserService {
     private final VerificationTokenRepo verificationTokenRepo;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-
+    private final CloudinaryUpload cloudinaryUpload;
     @Override
     public Users findById(Long id) {
         Optional<Users> users = userRepo.findById(id);
@@ -213,6 +214,26 @@ public class UserServiceIplm implements UserService {
         }
         save(users);
         return users;
+    }
+    @Override
+    public String upImageProfile(MultipartFile file) throws IOException {
+        Long userId = Utils.getIdCurrentUser();
+        Users users = findById(userId);
+        String imgUrl = users.getImageUrl();
+
+        Map params = ObjectUtils.asMap(
+                "resource_type", "auto",
+                "folder", "avatars"
+        );
+        Map map = cloudinaryUpload.cloudinary().uploader().upload(Convert.convertMultiPartToFile(file),params);
+        if (imgUrl!= null) {
+            cloudinaryUpload.cloudinary().uploader().destroy("avatars/" + cloudinaryUpload.getPublicId(imgUrl)
+                    , ObjectUtils.asMap("resource_type", "image"));
+        }
+        imgUrl = (String) map.get("secure_url");
+        users.setImageUrl(imgUrl);
+        save(users);
+        return imgUrl;
     }
 
 }

@@ -25,4 +25,5 @@ public interface UserService {
     boolean checkIfValidOldPassword(Users user, String oldPassword);
     Users updateUser(UserDTO userDTO);
     Object login(LoginRequest loginRequest, HttpServletRequest request);
+    String upImageProfile(MultipartFile file) throws IOException;
 }
