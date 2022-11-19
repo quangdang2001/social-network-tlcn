@@ -4,7 +4,7 @@ package com.tlcn.demo.service;
 import com.tlcn.demo.dto.PostDTO;
 import com.tlcn.demo.dto.PostReq;
 import com.tlcn.demo.model.Post;
-import org.cloudinary.json.JSONArray;
+import net.minidev.json.JSONArray;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -21,4 +21,6 @@ public interface PostService {
     List<PostDTO> findPostOfUser(Long userId,Long guestId ,Integer page, Integer size);
     List<PostDTO> findPostHomePage(Long userId, Integer page, Integer size);
     boolean likePost(Long userId, Long postId);
+    List<Post> findPostReported();
+    JSONArray getPostAdmin(int page, int size);
 }

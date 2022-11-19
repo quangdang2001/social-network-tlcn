@@ -26,4 +26,8 @@ public interface UserService {
     Users updateUser(UserDTO userDTO);
     Object login(LoginRequest loginRequest, HttpServletRequest request);
     String upImageProfile(MultipartFile file) throws IOException;
+    Page<Users> getUserAdmin(int page, int size);
+    boolean deleteUser(Long userId);
+    List<Users> findUserReported();
+    boolean enableUser(String email);
 }

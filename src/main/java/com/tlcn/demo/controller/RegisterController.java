@@ -184,7 +184,7 @@ public class RegisterController {
     private ResponseEntity<?> login(@RequestBody LoginRequest loginRequest,
                                     HttpServletRequest request){
         return ResponseEntity.ok()
-                .body(new ResponseDTO(true, "Success", userService.login(loginRequest,request)));
+                .body(userService.login(loginRequest,request));
     }
 
     private void resendVerificationTokenMail(String email, String applicationUrl, VerificationToken verificationToken) throws MessagingException {

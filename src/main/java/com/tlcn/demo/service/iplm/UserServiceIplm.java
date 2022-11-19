@@ -236,4 +236,44 @@ public class UserServiceIplm implements UserService {
         return imgUrl;
     }
 
+    @Override
+    public Page<Users> getUserAdmin(int page, int size) {
+        Pageable pageable = PageRequest.of(page,size);
+        Page<Users> users = userRepo.findAll(pageable);
+        return  users;
+    }
+
+    @Override
+    public boolean deleteUser(Long userId) {
+        try {
+            Users users = findById(userId);
+            users.setRole(null);
+            users.setEnable(false);
+            userRepo.save(users);
+//            userRepo.deleteById(userId);
+            return true;
+        }catch (Exception e){
+            log.error("User delete exception: ",e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public List<Users> findUserReported() {
+        return userRepo.findAllByCountReportGreaterThan(20);
+    }
+
+    @Override
+    public boolean enableUser(String email) {
+        try {
+            Users users = findUserByEmail(email);
+            users.setRole(Constant.ROLE_USER);
+            users.setEnable(true);
+            userRepo.save(users);
+            return true;
+        } catch (Exception e){
+            throw new AppException(400,"Failed");
+        }
+    }
+
 }

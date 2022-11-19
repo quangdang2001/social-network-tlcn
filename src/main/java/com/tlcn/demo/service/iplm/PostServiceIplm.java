@@ -19,8 +19,11 @@ import com.tlcn.demo.service.UserFollowingService;
 import com.tlcn.demo.service.UserService;
 import com.tlcn.demo.util.Convert;
 import lombok.RequiredArgsConstructor;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -178,6 +181,26 @@ public class PostServiceIplm implements PostService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public List<Post> findPostReported() {
+        List<Post> posts = postRepo.findAllByCountReportedGreaterThan(20);
+        return posts;
+    }
+
+    @Override
+    public JSONArray getPostAdmin(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createTime").descending());
+        var pagePost = postRepo.findAll(pageable);
+        JSONArray jsonArray = new JSONArray();
+        pagePost.forEach(post -> {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("userCreate", post.getUsers().getId());
+            jsonObject.put("post", post);
+            jsonArray.add(jsonObject);
+        });
+        return jsonArray;
     }
 
     private PostDTO convertPostToPostDTO(Post post, Users user) {
