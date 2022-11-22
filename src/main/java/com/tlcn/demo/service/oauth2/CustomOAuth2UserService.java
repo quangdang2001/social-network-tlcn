@@ -1,12 +1,12 @@
 package com.tlcn.demo.service.oauth2;
 
-import com.cnpm.socialmedia.exception.OAuth2AuthenticationProcessingException;
-import com.cnpm.socialmedia.model.Users;
-import com.cnpm.socialmedia.repo.UserRepo;
-import com.cnpm.socialmedia.service.auth.UserDetailIplm;
-import com.cnpm.socialmedia.service.oauth2.user.OAuth2UserInfo;
-import com.cnpm.socialmedia.service.oauth2.user.OAuth2UserInfoFactory;
-import com.cnpm.socialmedia.utils.Constant;
+import com.tlcn.demo.exception.OAuth2AuthenticationProcessingException;
+import com.tlcn.demo.model.Users;
+import com.tlcn.demo.repository.UserRepo;
+import com.tlcn.demo.service.auth.UserDetailIplm;
+import com.tlcn.demo.service.oauth2.user.OAuth2UserInfo;
+import com.tlcn.demo.service.oauth2.user.OAuth2UserInfoFactory;
+import com.tlcn.demo.util.contant.Constant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;

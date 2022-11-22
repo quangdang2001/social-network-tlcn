@@ -6,6 +6,7 @@ import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 
 import java.util.Collection;
@@ -13,7 +14,7 @@ import java.util.Collections;
 import java.util.Map;
 
 @Data
-public class UserDetailIplm implements UserDetails {
+public class UserDetailIplm implements UserDetails, OAuth2User {
 
     private Users users;
     private Map<String, Object> attributes;
@@ -63,4 +64,13 @@ public class UserDetailIplm implements UserDetails {
         return users.isEnable();
     }
 
+    @Override
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
+
+    @Override
+    public String getName() {
+        return users.getId().toString();
+    }
 }

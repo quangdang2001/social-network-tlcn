@@ -1,8 +1,8 @@
 package com.tlcn.demo.service.oauth2;
 
-import com.cnpm.socialmedia.model.Users;
-import com.cnpm.socialmedia.service.auth.UserDetailIplm;
-import com.cnpm.socialmedia.utils.JWTProvider;
+import com.tlcn.demo.model.Users;
+import com.tlcn.demo.service.auth.UserDetailIplm;
+import com.tlcn.demo.util.JWTProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
