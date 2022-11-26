@@ -3,6 +3,9 @@ package com.tlcn.demo.config;
 
 
 import com.tlcn.demo.service.filter.UserAuthorizationFilter;
+import com.tlcn.demo.service.oauth2.CustomOAuth2UserService;
+import com.tlcn.demo.service.oauth2.OAuth2AuthenticationFailureHandler;
+import com.tlcn.demo.service.oauth2.OAuth2LoginSuccessHandler;
 import com.tlcn.demo.util.contant.Constant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +29,12 @@ import org.springframework.web.cors.CorsConfiguration;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsService userDetailsService;
+    @Autowired
+    private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+    @Autowired
+    private CustomOAuth2UserService customOAuth2UserService;
+    @Autowired
+    private OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
     private static final String[] WHITE_LIST_URLS = {
             "/api/login/**",
@@ -64,7 +73,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests()
                 .antMatchers("/api/**").hasAnyAuthority(Constant.ROLE_USER, Constant.ROLE_ADMIN)
-                .antMatchers("/admin/**").hasAnyAuthority(Constant.ROLE_ADMIN);
+                .antMatchers("/admin/**").hasAnyAuthority(Constant.ROLE_ADMIN)
+
+                .and().oauth2Login()
+                .authorizationEndpoint()
+                .baseUri("/oauth2/authorize")
+                .and()
+                .redirectionEndpoint()
+                .baseUri("/oauth2/callback/*")
+                .and()
+                .userInfoEndpoint()
+                .userService(customOAuth2UserService)
+                .and()
+                .successHandler(oAuth2LoginSuccessHandler)
+                .failureHandler(oAuth2AuthenticationFailureHandler);
 
         http.addFilterBefore(new UserAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
 
