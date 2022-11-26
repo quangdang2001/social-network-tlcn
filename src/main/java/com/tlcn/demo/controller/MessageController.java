@@ -9,9 +9,12 @@ import com.tlcn.demo.util.Utils;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -24,9 +27,9 @@ public class MessageController {
 
     private final MessageService messageService;
 
-    @PostMapping("/message")
-    private ResponseEntity<?> sendMessage(@RequestBody MessageDTO messageDTO){
-        MessageDTO message =messageService.sendMessage(messageDTO);
+    @PostMapping(path = "/message")
+    private ResponseEntity<?> sendMessage(@ModelAttribute MessageDTO messageDTO) throws IOException {
+        MessageDTO message =messageService.sendMessage(messageDTO, messageDTO.getFiles());
         if (message!=null){
 
             return ResponseEntity.ok(new ResponseDTO(true,"Success",message));

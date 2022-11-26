@@ -2,8 +2,14 @@ package com.tlcn.demo.service.Cloudinary;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.tlcn.demo.util.Convert;
+import com.tlcn.demo.util.contant.FolderName;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.Map;
 
 
 @Configuration
@@ -16,6 +22,15 @@ public class CloudinaryUpload {
                 "api_secret", "V37UHtOmQ62U1VH-kXyd7kRLgf4",
                 "secure", true));
         return cloudinary;
+    }
+
+    public String upload(MultipartFile file, FolderName folderName) throws IOException {
+        Map params = ObjectUtils.asMap(
+                "resource_type", "auto",
+                "folder", folderName.getName()
+        );
+        Map map = cloudinary().uploader().upload(Convert.convertMultiPartToFile(file),params);
+        return  (String) map.get("secure_url");
     }
 
     public String getPublicId(String urlImage){

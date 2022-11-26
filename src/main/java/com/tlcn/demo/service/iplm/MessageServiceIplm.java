@@ -7,19 +7,20 @@ import com.tlcn.demo.model.Message;
 import com.tlcn.demo.model.Users;
 import com.tlcn.demo.repository.MessageRepo;
 import com.tlcn.demo.repository.UserRepo;
+import com.tlcn.demo.service.Cloudinary.CloudinaryUpload;
 import com.tlcn.demo.service.MessageService;
 import com.tlcn.demo.service.UserService;
 import com.tlcn.demo.util.Utils;
+import com.tlcn.demo.util.contant.FolderName;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.io.IOException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,10 +30,10 @@ public class MessageServiceIplm implements MessageService {
     private final MessageRepo messageRepo;
     private final UserService userService;
     private final UserRepo userRepo;
-
+    private final CloudinaryUpload cloudinaryUpload;
 
     @Override
-    public MessageDTO sendMessage(MessageDTO messageDTO) {
+    public MessageDTO sendMessage(MessageDTO messageDTO, List<MultipartFile> files) throws IOException {
         Long userId = Utils.getIdCurrentUser();
         Message message = new Message();
         if (!userRepo.existsById(userId) || !userRepo.existsById(messageDTO.getReceiverId()))
@@ -48,9 +49,27 @@ public class MessageServiceIplm implements MessageService {
         Long senderId = userId;
         message.setRoom(getRoom(receiverId, senderId));
         messageRepo.save(message);
+        if (files == null) files = new ArrayList<>();
+        files.forEach(file -> {
+            Message messageFile = new Message();
+            String url = null;
+            try {
+                url = cloudinaryUpload.upload(file, FolderName.FILE);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            messageFile.setMessage(url);
+            messageFile.setCreateTime(new Date());
+            messageFile.setSender(usersSend);
+            messageFile.setReceiver(usersReceiver);
+            messageFile.setRoom(getRoom(receiverId, senderId));
+            messageRepo.save(messageFile);
+            messageDTO.setMessage(messageDTO.getMessage() + "||"+ url);
+        });
+
         messageDTO.setRoom(getRoom(receiverId, senderId));
         messageDTO.setCreateTime(new Date());
-
+        messageDTO.setFiles(null);
         return messageDTO;
     }
 

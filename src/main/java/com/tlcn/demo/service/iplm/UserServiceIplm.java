@@ -17,6 +17,7 @@ import com.tlcn.demo.util.Convert;
 import com.tlcn.demo.util.JWTProvider;
 import com.tlcn.demo.util.Utils;
 import com.tlcn.demo.util.contant.Constant;
+import com.tlcn.demo.util.contant.FolderName;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -221,16 +222,11 @@ public class UserServiceIplm implements UserService {
         Users users = findById(userId);
         String imgUrl = users.getImageUrl();
 
-        Map params = ObjectUtils.asMap(
-                "resource_type", "auto",
-                "folder", "avatars"
-        );
-        Map map = cloudinaryUpload.cloudinary().uploader().upload(Convert.convertMultiPartToFile(file),params);
         if (imgUrl!= null) {
             cloudinaryUpload.cloudinary().uploader().destroy("avatars/" + cloudinaryUpload.getPublicId(imgUrl)
                     , ObjectUtils.asMap("resource_type", "image"));
         }
-        imgUrl = (String) map.get("secure_url");
+        imgUrl = cloudinaryUpload.upload(file, FolderName.AVATARS);
         users.setImageUrl(imgUrl);
         save(users);
         return imgUrl;

@@ -1,10 +1,13 @@
 package com.tlcn.demo.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -17,6 +20,17 @@ public class MessageDTO {
     private Long receiverId;
     private String senderAvatar;
     private String room;
+    private List<MultipartFile> files;
+
+    public MessageDTO(Long id, String message, Date createTime, Long senderId, Long receiverId, String senderAvatar, String room) {
+        this.id = id;
+        this.message = message;
+        this.createTime = createTime;
+        this.senderId = senderId;
+        this.receiverId = receiverId;
+        this.senderAvatar = senderAvatar;
+        this.room = room;
+    }
 
     @Data
     @AllArgsConstructor
