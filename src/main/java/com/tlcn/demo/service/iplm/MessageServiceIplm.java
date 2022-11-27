@@ -48,7 +48,9 @@ public class MessageServiceIplm implements MessageService {
         Long receiverId = messageDTO.getReceiverId();
         Long senderId = userId;
         message.setRoom(getRoom(receiverId, senderId));
-        messageRepo.save(message);
+        if (message.getMessage()!=null && !message.getMessage().isEmpty()) {
+            messageRepo.save(message);
+        }
         if (files != null) {
             files.forEach(file -> {
                 Message messageFile = new Message();
