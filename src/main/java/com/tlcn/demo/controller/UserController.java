@@ -33,7 +33,7 @@ public class UserController {
 
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
-
+    private final UserFollowingService userFollowingService;
 
     @PostMapping(path = "/user/upimg",consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -82,6 +82,10 @@ public class UserController {
         user.setRole(Constant.ROLE_ADMIN);
         userService.save(user);
         return ResponseEntity.ok(user);
+    }
+    @GetMapping("/user/topFollower")
+    public ResponseEntity<?> getUserTop(){
+        return ResponseEntity.ok(new ResponseDTO(true,"Success",userFollowingService.top10Follower()));
     }
 
 }
