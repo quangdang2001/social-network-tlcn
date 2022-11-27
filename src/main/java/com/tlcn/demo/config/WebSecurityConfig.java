@@ -6,6 +6,7 @@ import com.tlcn.demo.service.filter.UserAuthorizationFilter;
 import com.tlcn.demo.service.oauth2.CustomOAuth2UserService;
 import com.tlcn.demo.service.oauth2.OAuth2AuthenticationFailureHandler;
 import com.tlcn.demo.service.oauth2.OAuth2LoginSuccessHandler;
+import com.tlcn.demo.service.oauth2.user.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.tlcn.demo.util.contant.Constant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +79,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().oauth2Login()
                 .authorizationEndpoint()
                 .baseUri("/oauth2/authorize")
+                .authorizationRequestRepository(cookieOAuth2AuthorizationRequestRepository())
                 .and()
                 .redirectionEndpoint()
                 .baseUri("/oauth2/callback/*")
@@ -102,5 +104,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
-
+    @Bean
+    public HttpCookieOAuth2AuthorizationRequestRepository cookieOAuth2AuthorizationRequestRepository(){
+        return new HttpCookieOAuth2AuthorizationRequestRepository();
+    }
 }
