@@ -3,6 +3,7 @@ package com.tlcn.demo.service.iplm;
 import com.cloudinary.utils.ObjectUtils;
 
 import com.tlcn.demo.dto.LoginRequest;
+import com.tlcn.demo.dto.PersonalPage;
 import com.tlcn.demo.dto.UserDTO;
 import com.tlcn.demo.exception.AppException;
 import com.tlcn.demo.model.UserFollowing;
@@ -11,6 +12,7 @@ import com.tlcn.demo.model.VerificationToken;
 import com.tlcn.demo.repository.UserRepo;
 import com.tlcn.demo.repository.VerificationTokenRepo;
 import com.tlcn.demo.service.Cloudinary.CloudinaryUpload;
+import com.tlcn.demo.service.UserFollowingService;
 import com.tlcn.demo.service.UserService;
 import com.tlcn.demo.service.auth.UserDetailIplm;
 import com.tlcn.demo.util.Convert;
@@ -49,6 +51,8 @@ public class UserServiceIplm implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final CloudinaryUpload cloudinaryUpload;
+    private final UserFollowingService userFollowingService;
+
     @Override
     public Users findById(Long id) {
         Optional<Users> users = userRepo.findById(id);
@@ -270,6 +274,27 @@ public class UserServiceIplm implements UserService {
         } catch (Exception e){
             throw new AppException(400,"Failed");
         }
+    }
+
+    @Override
+    public PersonalPage seePersonalPage(Long personalPageId) {
+        Long userId = Utils.getIdCurrentUser();
+        Users users = findById(personalPageId);
+        UserFollowing checkFollowing = userFollowingService.checkFollow(userId,personalPageId);
+        PersonalPage personalPage = new PersonalPage();
+        personalPage.setId(users.getId());
+        personalPage.setFirstName(users.getFirstName());
+        personalPage.setLastName(users.getLastName());
+        personalPage.setEmail(users.getEmail());
+        personalPage.setImageUrl(users.getImageUrl());
+        personalPage.setGender(users.getGender());
+        personalPage.setBio(users.getBio());
+        personalPage.setAddress(users.getAddress());
+        personalPage.setEnable(users.isEnable());
+        personalPage.setCountFollower(users.getCountFollower());
+        personalPage.setCountFollowing(users.getCountFollowing());
+        personalPage.setFollow(checkFollowing != null);
+        return personalPage;
     }
 
 }

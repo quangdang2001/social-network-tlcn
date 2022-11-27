@@ -1,6 +1,7 @@
 package com.tlcn.demo.service;
 
 import com.tlcn.demo.dto.LoginRequest;
+import com.tlcn.demo.dto.PersonalPage;
 import com.tlcn.demo.dto.UserDTO;
 import com.tlcn.demo.model.Users;
 import com.tlcn.demo.model.VerificationToken;
@@ -30,4 +31,5 @@ public interface UserService {
     boolean deleteUser(Long userId);
     List<Users> findUserReported();
     boolean enableUser(String email);
+    PersonalPage seePersonalPage(Long personalPageId);
 }
