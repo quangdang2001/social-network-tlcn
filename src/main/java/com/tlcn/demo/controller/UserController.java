@@ -34,6 +34,7 @@ public class UserController {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final UserFollowingService userFollowingService;
+    private final NotificationService notificationService;
 
     @PostMapping(path = "/user/upimg",consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -86,6 +87,16 @@ public class UserController {
     @GetMapping("/user/topFollower")
     public ResponseEntity<?> getUserTop(){
         return ResponseEntity.ok(new ResponseDTO(true,"Success",userFollowingService.top10Follower()));
+    }
+
+    @GetMapping("/user/notification")
+    private ResponseEntity<?> getNotifi(@RequestParam(defaultValue = "0") Integer page,
+                                        @RequestParam(defaultValue = "10") Integer size){
+        Long userId = Utils.getIdCurrentUser();
+        List<NotificationDTO> notificationDTOS = notificationService.findNotificationByUserId(userId,page,size);
+
+        return ResponseEntity.ok().body(new ResponseDTO(true,"Success",
+                notificationDTOS));
     }
 
 }
