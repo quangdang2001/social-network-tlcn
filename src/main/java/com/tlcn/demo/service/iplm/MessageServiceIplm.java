@@ -53,18 +53,20 @@ public class MessageServiceIplm implements MessageService {
             files.forEach(file -> {
                 Message messageFile = new Message();
                 String url = null;
-                try {
-                    url = cloudinaryUpload.upload(file, FolderName.FILE);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if (!file.isEmpty()) {
+                    try {
+                        url = cloudinaryUpload.upload(file, FolderName.FILE);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    messageFile.setMessage(url);
+                    messageFile.setCreateTime(new Date());
+                    messageFile.setSender(usersSend);
+                    messageFile.setReceiver(usersReceiver);
+                    messageFile.setRoom(getRoom(receiverId, senderId));
+                    messageRepo.save(messageFile);
+                    messageDTO.setMessage(messageDTO.getMessage() + "||" + url);
                 }
-                messageFile.setMessage(url);
-                messageFile.setCreateTime(new Date());
-                messageFile.setSender(usersSend);
-                messageFile.setReceiver(usersReceiver);
-                messageFile.setRoom(getRoom(receiverId, senderId));
-                messageRepo.save(messageFile);
-                messageDTO.setMessage(messageDTO.getMessage() + "||" + url);
             });
         }
         messageDTO.setRoom(getRoom(receiverId, senderId));
