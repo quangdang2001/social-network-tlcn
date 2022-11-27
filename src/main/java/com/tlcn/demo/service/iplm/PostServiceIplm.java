@@ -1,23 +1,23 @@
 package com.tlcn.demo.service.iplm;
 
 import com.cloudinary.utils.ObjectUtils;
+import com.tlcn.demo.controller.ws.Payload.NotificationPayload;
 import com.tlcn.demo.dto.PostDTO;
 import com.tlcn.demo.dto.PostReq;
 import com.tlcn.demo.dto.PostShareDTO;
 import com.tlcn.demo.dto.UserDTO;
-import com.tlcn.demo.model.ImagePost;
-import com.tlcn.demo.model.Post;
-import com.tlcn.demo.model.PostLike;
-import com.tlcn.demo.model.Users;
+import com.tlcn.demo.model.*;
 import com.tlcn.demo.repository.ImagePostRepo;
 import com.tlcn.demo.repository.PostLikeRepo;
 import com.tlcn.demo.repository.PostRepo;
 import com.tlcn.demo.repository.UserRepo;
 import com.tlcn.demo.service.Cloudinary.CloudinaryUpload;
+import com.tlcn.demo.service.NotificationService;
 import com.tlcn.demo.service.PostService;
 import com.tlcn.demo.service.UserFollowingService;
 import com.tlcn.demo.service.UserService;
 import com.tlcn.demo.util.Convert;
+import com.tlcn.demo.util.Utils;
 import lombok.RequiredArgsConstructor;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
@@ -30,10 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +44,7 @@ public class PostServiceIplm implements PostService {
     private final PostLikeRepo postLikeRepo;
     private final UserRepo userRepo;
     private final UserFollowingService userFollowingService;
-
+    private final NotificationService notificationService;
     @Override
     public Post save(Post post) {
         return postRepo.save(post);
@@ -201,6 +198,34 @@ public class PostServiceIplm implements PostService {
             jsonArray.add(jsonObject);
         });
         return jsonArray;
+    }
+
+    @Override
+    public NotificationPayload sharePost(PostDTO postDTO) {
+        Post post = new Post();
+        Long userId = Utils.getIdCurrentUser();
+        Users userCreate = userService.findById(userId);
+
+        if (userCreate.isEnable()) {
+            Post postParent = findPostById(postDTO.getPostSharedId());
+            postParent.setCountShated(post.getCountShated() + 1);
+            post.setPostShare(true);
+            post.setContent(postDTO.getContent());
+            post.setUsers(userCreate);
+            post.setPostShared(postParent);
+            post.setCreateTime(new Date());
+
+            save(post);
+            save(postParent);
+            Users users = post.getUsers();
+            if (!post.getPostShared().getUsers().getId().equals(userId)) {
+                String content = String.format("%s %s shared your post.", users.getLastName(), users.getFirstName());
+                Notification notification = notificationService.sendNotificationPost(post.getPostShared(), userCreate, content);
+                notificationService.save(notification);
+                return Convert.convertNotificationToNotifiPayload(notification);
+            }
+        }
+        return null;
     }
 
     private PostDTO convertPostToPostDTO(Post post, Users user) {

@@ -1,6 +1,7 @@
 package com.tlcn.demo.service;
 
 
+import com.tlcn.demo.controller.ws.Payload.NotificationPayload;
 import com.tlcn.demo.dto.PostDTO;
 import com.tlcn.demo.dto.PostReq;
 import com.tlcn.demo.model.Post;
@@ -23,4 +24,5 @@ public interface PostService {
     boolean likePost(Long userId, Long postId);
     List<Post> findPostReported();
     JSONArray getPostAdmin(int page, int size);
+    NotificationPayload sharePost(PostDTO postDTO);
 }

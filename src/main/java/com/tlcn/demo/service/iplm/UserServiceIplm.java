@@ -297,4 +297,21 @@ public class UserServiceIplm implements UserService {
         return personalPage;
     }
 
+    @Override
+    public Set<Users> searchUser(String keyword) {
+        keyword = keyword.trim();
+        keyword = keyword.replaceAll("  ", " ");
+        Set<Users> users= new HashSet<>();
+        if (keyword.contains("gmail")){
+            keyword = keyword.substring(0,keyword.indexOf("@"));
+
+            users.addAll(userRepo.searchByEmail(keyword));
+        }
+        else {
+            users.addAll(userRepo.searchUserFirstLastName(keyword));
+            users.addAll(userRepo.searchUserLastFirstName(keyword));
+        }
+        return users;
+    }
+
 }

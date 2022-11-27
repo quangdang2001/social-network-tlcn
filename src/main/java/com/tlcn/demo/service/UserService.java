@@ -32,4 +32,5 @@ public interface UserService {
     List<Users> findUserReported();
     boolean enableUser(String email);
     PersonalPage seePersonalPage(Long personalPageId);
+    Set<Users> searchUser(String keyword);
 }
