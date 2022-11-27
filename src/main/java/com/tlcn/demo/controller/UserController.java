@@ -99,4 +99,12 @@ public class UserController {
                 notificationDTOS));
     }
 
+    @GetMapping("/user/personalPage")
+    public ResponseEntity<?> seePersonalPage(@RequestParam Long personalPageId){
+        PersonalPage personalPage = userService.seePersonalPage(personalPageId);
+        return ResponseEntity.ok().body(new ResponseDTO(true,"Success",
+                personalPage));
+
+    }
+
 }
