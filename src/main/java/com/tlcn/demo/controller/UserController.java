@@ -106,5 +106,11 @@ public class UserController {
                 personalPage));
 
     }
-
+    @GetMapping("/user/following")
+    public ResponseEntity<?> getFollowing(){
+        Long userId = Utils.getIdCurrentUser();
+        List<UserFollowDTO> userDTOList = userFollowingService.findAllFollowingUser(userId);
+        return ResponseEntity.ok().body(new ResponseDTO(true,"Success",
+                userDTOList));
+    }
 }
