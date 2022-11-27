@@ -49,24 +49,24 @@ public class MessageServiceIplm implements MessageService {
         Long senderId = userId;
         message.setRoom(getRoom(receiverId, senderId));
         messageRepo.save(message);
-        if (files == null) files = new ArrayList<>();
-        files.forEach(file -> {
-            Message messageFile = new Message();
-            String url = null;
-            try {
-                url = cloudinaryUpload.upload(file, FolderName.FILE);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            messageFile.setMessage(url);
-            messageFile.setCreateTime(new Date());
-            messageFile.setSender(usersSend);
-            messageFile.setReceiver(usersReceiver);
-            messageFile.setRoom(getRoom(receiverId, senderId));
-            messageRepo.save(messageFile);
-            messageDTO.setMessage(messageDTO.getMessage() + "||"+ url);
-        });
-
+        if (files != null) {
+            files.forEach(file -> {
+                Message messageFile = new Message();
+                String url = null;
+                try {
+                    url = cloudinaryUpload.upload(file, FolderName.FILE);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                messageFile.setMessage(url);
+                messageFile.setCreateTime(new Date());
+                messageFile.setSender(usersSend);
+                messageFile.setReceiver(usersReceiver);
+                messageFile.setRoom(getRoom(receiverId, senderId));
+                messageRepo.save(messageFile);
+                messageDTO.setMessage(messageDTO.getMessage() + "||" + url);
+            });
+        }
         messageDTO.setRoom(getRoom(receiverId, senderId));
         messageDTO.setCreateTime(new Date());
         messageDTO.setFiles(null);
