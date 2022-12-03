@@ -14,6 +14,7 @@ import com.tlcn.demo.util.Utils;
 import com.tlcn.demo.util.contant.FolderName;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,59 +29,21 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MessageServiceIplm implements MessageService {
     private final MessageRepo messageRepo;
-    private final UserService userService;
     private final UserRepo userRepo;
     private final CloudinaryUpload cloudinaryUpload;
+    private final ModelMapper modelMapper;
 
     @Override
     public MessageDTO sendMessage(MessageDTO messageDTO, List<MultipartFile> files) throws IOException {
-        Long userId = Utils.getIdCurrentUser();
-        Message message = new Message();
-        if (!userRepo.existsById(userId) || !userRepo.existsById(messageDTO.getReceiverId()))
-            return null;
-        Users usersSend = userRepo.getById(userId);
-        Users usersReceiver = userRepo.getById(messageDTO.getReceiverId());
-
-        message.setMessage(messageDTO.getMessage());
-        message.setCreateTime(new Date());
-        message.setSender(usersSend);
-        message.setReceiver(usersReceiver);
-        Long receiverId = messageDTO.getReceiverId();
-        Long senderId = userId;
-        message.setRoom(getRoom(receiverId, senderId));
-        message.setType("TEXT");
-        if (message.getMessage()!=null && !message.getMessage().isEmpty()) {
-            messageRepo.save(message);
+        Message message;
+        if (messageDTO.getMessage()!=null){
+             message = sendText(messageDTO);
         }
-
-        if (files != null) {
-            files.forEach(file -> {
-                Message messageFile = new Message();
-                String url = null;
-                Map map = null;
-                if (!file.isEmpty()) {
-                    try {
-                        map = cloudinaryUpload.upload(file, FolderName.FILE);
-                        url = (String) map.get("secure_url");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    messageFile.setType(map.get("resource_type").equals("image") ? "IMAGE" : "FILE");
-                    messageFile.setFileName(file.getOriginalFilename());
-                    messageFile.setMessage(url);
-                    messageFile.setCreateTime(new Date());
-                    messageFile.setSender(usersSend);
-                    messageFile.setReceiver(usersReceiver);
-                    messageFile.setRoom(getRoom(receiverId, senderId));
-                    messageRepo.save(messageFile);
-                    messageDTO.setMessage(url);
-                    messageDTO.setType(messageFile.getType());
-                    messageDTO.setFileName(file.getOriginalFilename());
-                }
-            });
-        }
-        messageDTO.setRoom(getRoom(receiverId, senderId));
-        messageDTO.setCreateTime(new Date());
+        else message = sendFile(messageDTO, files);
+        modelMapper.map(message, messageDTO);
+        messageDTO.setSenderId(message.getSender().getId());
+        messageDTO.setReceiverId(message.getReceiver().getId());
+        messageDTO.setSenderAvatar(message.getSender().getImageUrl());
         messageDTO.setFiles(null);
         return messageDTO;
     }
@@ -137,5 +100,60 @@ public class MessageServiceIplm implements MessageService {
 
     public String getRoom(Long receiverId, Long senderId) {
         return String.valueOf(receiverId + senderId) + String.valueOf(receiverId * senderId);
+    }
+
+    private Message sendText(MessageDTO messageDTO) {
+        Long userId = Utils.getIdCurrentUser();
+        Message message = new Message();
+        if (!userRepo.existsById(userId) || !userRepo.existsById(messageDTO.getReceiverId()))
+            return null;
+        Users usersSend = userRepo.getById(userId);
+        Users usersReceiver = userRepo.getById(messageDTO.getReceiverId());
+
+        message.setMessage(messageDTO.getMessage());
+        message.setCreateTime(new Date());
+        message.setSender(usersSend);
+        message.setReceiver(usersReceiver);
+        Long receiverId = messageDTO.getReceiverId();
+        Long senderId = userId;
+        message.setRoom(getRoom(receiverId, senderId));
+        message.setType("TEXT");
+        if (message.getMessage() != null && !message.getMessage().isEmpty()) {
+            messageRepo.save(message);
+        }
+        return message;
+    }
+
+    private Message sendFile(MessageDTO messageDTO, List<MultipartFile> files){
+        Long userId = Utils.getIdCurrentUser();
+        Message messageFile = new Message();
+        if (!userRepo.existsById(userId) || !userRepo.existsById(messageDTO.getReceiverId()))
+            return null;
+        Users usersSend = userRepo.getById(userId);
+        Users usersReceiver = userRepo.getById(messageDTO.getReceiverId());
+        Long receiverId = messageDTO.getReceiverId();
+        if (files != null) {
+            files.forEach(file -> {
+                String url = null;
+                Map map = null;
+                if (!file.isEmpty()) {
+                    try {
+                        map = cloudinaryUpload.upload(file, FolderName.FILE);
+                        url = (String) map.get("secure_url");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    messageFile.setType(map.get("resource_type").equals("image") ? "IMAGE" : "FILE");
+                    messageFile.setFileName(file.getOriginalFilename());
+                    messageFile.setMessage(url);
+                    messageFile.setCreateTime(new Date());
+                    messageFile.setSender(usersSend);
+                    messageFile.setReceiver(usersReceiver);
+                    messageFile.setRoom(getRoom(receiverId, userId));
+                    messageRepo.save(messageFile);
+                }
+            });
+        }
+        return messageFile;
     }
 }
