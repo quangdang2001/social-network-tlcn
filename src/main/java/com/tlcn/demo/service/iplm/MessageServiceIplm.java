@@ -80,23 +80,24 @@ public class MessageServiceIplm implements MessageService {
     @Override
     public List<UserChatDTO> findUserChat(Long userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        List<Users> usersSender = messageRepo.findSenderChat(userId, pageable);
-        List<Users> userReceiver = messageRepo.findReceiverChat(userId, pageable);
-        int length = userReceiver.size();
-        List<Users> conversations = new ArrayList<>();
-        for (int i = 0; i < length; i++) {
-            if (!usersSender.get(i).getId().equals(userId)) {
-                conversations.add(usersSender.get(i));
-            } else
-                conversations.add(userReceiver.get(i));
-        }
-
-        conversations = conversations.stream().distinct().collect(Collectors.toList());
+        List<ConversationDTO> conversationDTOS = messageRepo.getConversation(userId,pageable);
+        var listUserId = conversationDTOS.
+                stream().map(ConversationDTO::getReceiverId).collect(Collectors.toList());
+        List<Users> users = userRepo.findAllByIdIn(listUserId);
         List<UserChatDTO> userChatDTOS = new ArrayList<>();
-        conversations.forEach(user -> {
-            userChatDTOS.add(new UserChatDTO(user.getId(), user.getFirstName(), user.getLastName(), user.getImageUrl()
-                    , user.getEmail(), getRoom(userId, user.getId())));
+        List<UserChatDTO> finalUserChatDTOS = userChatDTOS;
+        users.forEach(user -> {
+            var createTime = conversationDTOS.stream().filter(c -> {
+               if (c.getReceiverId().equals(user.getId())) return true;
+                return false;
+            }).findFirst();
+            finalUserChatDTOS.add(new UserChatDTO(user.getId(), user.getFirstName(), user.getLastName(), user.getImageUrl()
+                    , user.getEmail(), getRoom(userId, user.getId()),createTime.get().getCreateTime()));
         });
+        userChatDTOS =
+                userChatDTOS.stream()
+                        .sorted(Comparator.comparing(UserChatDTO::getRecentlyTime).reversed())
+                        .collect(Collectors.toList());
         return userChatDTOS;
     }
 
