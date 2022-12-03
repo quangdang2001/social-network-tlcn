@@ -1,6 +1,7 @@
 package com.tlcn.demo.service.iplm;
 
 
+import com.tlcn.demo.dto.ConversationDTO;
 import com.tlcn.demo.dto.MessageDTO;
 import com.tlcn.demo.dto.UserChatDTO;
 import com.tlcn.demo.model.Message;
@@ -57,7 +58,8 @@ public class MessageServiceIplm implements MessageService {
         messages.forEach(message -> {
             messageDTOS.add(new MessageDTO(message.getId(), message.getMessage(),
                     message.getCreateTime(), message.getSender().getId(),
-                    message.getReceiver().getId(), message.getSender().getImageUrl(), room));
+                    message.getReceiver().getId(), message.getSender().getImageUrl(), room, message.getType()
+                    ,message.getFileName()));
         });
         Collections.reverse(messageDTOS);
         return messageDTOS;
