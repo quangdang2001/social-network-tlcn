@@ -20,9 +20,10 @@ public interface MessageRepo extends JpaRepository<Message, Long> {
     @Query("select distinct m.receiver,m.sender, m.createTime from Message m where m.sender.id = :id or m.receiver.id = :id order by m.createTime desc")
     List<Users> findReceiverChat(Long id, Pageable pageable);
 
-    @Query(value = "SELECT DISTINCT RECEIVER_ID, SENDER_ID" +
-            "FROM MESSAGE" +
-            "WHERE SENDER_ID = :senderId",
+    @Query(value = "SELECT RECEIVER_ID AS receiverId, MAX(CREATE_TIME) AS createTime\n" +
+            "FROM MESSAGE WHERE SENDER_ID = :senderId\n" +
+            "GROUP BY RECEIVER_ID\n" +
+            "ORDER BY createTime DESC",
     nativeQuery = true)
     List<ConversationDTO> getConversation(Long senderId, Pageable pageable);
 }

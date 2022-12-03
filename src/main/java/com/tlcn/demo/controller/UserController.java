@@ -130,4 +130,11 @@ public class UserController {
                 notificationPayload));
 
     }
+    @GetMapping("/user/follower")
+    public ResponseEntity<?> getFollower(){
+        Long userId = Utils.getIdCurrentUser();
+        List<UserFollowDTO> userDTOList = userFollowingService.findAllFollowerUser(userId);
+        return ResponseEntity.ok().body(new ResponseDTO(true,"Success",
+                userDTOList));
+    }
 }
