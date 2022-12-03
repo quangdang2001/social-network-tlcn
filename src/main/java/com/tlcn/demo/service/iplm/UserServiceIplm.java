@@ -230,7 +230,7 @@ public class UserServiceIplm implements UserService {
             cloudinaryUpload.cloudinary().uploader().destroy("avatars/" + cloudinaryUpload.getPublicId(imgUrl)
                     , ObjectUtils.asMap("resource_type", "image"));
         }
-        imgUrl = cloudinaryUpload.upload(file, FolderName.AVATARS);
+        imgUrl = (String) cloudinaryUpload.upload(file, FolderName.AVATARS).get("secure_url");
         users.setImageUrl(imgUrl);
         save(users);
         return imgUrl;

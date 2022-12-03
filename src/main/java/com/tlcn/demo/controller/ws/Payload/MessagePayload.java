@@ -14,4 +14,6 @@ public class MessagePayload {
     private String senderAvatar;
     private String room;
     private String fullName;
+    private String type;
+    private String fileName;
 }

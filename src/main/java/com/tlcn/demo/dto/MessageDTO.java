@@ -21,7 +21,8 @@ public class MessageDTO {
     private String senderAvatar;
     private String room;
     private List<MultipartFile> files;
-
+    private String type;
+    private String fileName;
     public MessageDTO(Long id, String message, Date createTime, Long senderId, Long receiverId, String senderAvatar, String room) {
         this.id = id;
         this.message = message;

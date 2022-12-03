@@ -24,13 +24,13 @@ public class CloudinaryUpload {
         return cloudinary;
     }
 
-    public String upload(MultipartFile file, FolderName folderName) throws IOException {
+    public Map upload(MultipartFile file, FolderName folderName) throws IOException {
         Map params = ObjectUtils.asMap(
                 "resource_type", "auto",
                 "folder", folderName.getName()
         );
         Map map = cloudinary().uploader().upload(Convert.convertMultiPartToFile(file),params);
-        return  (String) map.get("secure_url");
+        return map;
     }
 
     public String getPublicId(String urlImage){

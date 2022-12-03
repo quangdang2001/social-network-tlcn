@@ -25,4 +25,6 @@ public class Message {
     @ManyToOne(fetch = FetchType.LAZY)
     private Users receiver;
     private String room;
+    private String type;
+    private String fileName;
 }

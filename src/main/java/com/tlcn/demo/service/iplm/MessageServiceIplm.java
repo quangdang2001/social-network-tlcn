@@ -48,26 +48,34 @@ public class MessageServiceIplm implements MessageService {
         Long receiverId = messageDTO.getReceiverId();
         Long senderId = userId;
         message.setRoom(getRoom(receiverId, senderId));
+        message.setType("TEXT");
         if (message.getMessage()!=null && !message.getMessage().isEmpty()) {
             messageRepo.save(message);
         }
+
         if (files != null) {
             files.forEach(file -> {
                 Message messageFile = new Message();
                 String url = null;
+                Map map = null;
                 if (!file.isEmpty()) {
                     try {
-                        url = cloudinaryUpload.upload(file, FolderName.FILE);
+                        map = cloudinaryUpload.upload(file, FolderName.FILE);
+                        url = (String) map.get("secure_url");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                    messageFile.setType(map.get("resource_type").equals("image") ? "IMAGE" : "FILE");
+                    messageFile.setFileName(file.getOriginalFilename());
                     messageFile.setMessage(url);
                     messageFile.setCreateTime(new Date());
                     messageFile.setSender(usersSend);
                     messageFile.setReceiver(usersReceiver);
                     messageFile.setRoom(getRoom(receiverId, senderId));
                     messageRepo.save(messageFile);
-                    messageDTO.setMessage(messageDTO.getMessage() + "||" + url);
+                    messageDTO.setMessage(url);
+                    messageDTO.setType(messageFile.getType());
+                    messageDTO.setFileName(file.getOriginalFilename());
                 }
             });
         }
