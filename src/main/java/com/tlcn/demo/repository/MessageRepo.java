@@ -1,6 +1,7 @@
 package com.tlcn.demo.repository;
 
 
+import com.tlcn.demo.dto.ConversationDTO;
 import com.tlcn.demo.model.Message;
 import com.tlcn.demo.model.Users;
 import org.springframework.data.domain.Pageable;
@@ -19,4 +20,9 @@ public interface MessageRepo extends JpaRepository<Message, Long> {
     @Query("select distinct m.receiver,m.sender, m.createTime from Message m where m.sender.id = :id or m.receiver.id = :id order by m.createTime desc")
     List<Users> findReceiverChat(Long id, Pageable pageable);
 
+    @Query(value = "SELECT DISTINCT RECEIVER_ID, SENDER_ID" +
+            "FROM MESSAGE" +
+            "WHERE SENDER_ID = :senderId",
+    nativeQuery = true)
+    List<ConversationDTO> getConversation(Long senderId, Pageable pageable);
 }

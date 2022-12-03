@@ -23,7 +23,8 @@ public class MessageDTO {
     private List<MultipartFile> files;
     private String type;
     private String fileName;
-    public MessageDTO(Long id, String message, Date createTime, Long senderId, Long receiverId, String senderAvatar, String room) {
+    public MessageDTO(Long id, String message, Date createTime, Long senderId, Long receiverId, String senderAvatar, String room,
+                      String type, String fileName) {
         this.id = id;
         this.message = message;
         this.createTime = createTime;
@@ -31,6 +32,8 @@ public class MessageDTO {
         this.receiverId = receiverId;
         this.senderAvatar = senderAvatar;
         this.room = room;
+        this.type = type;
+        this.fileName = fileName;
     }
 
     @Data
