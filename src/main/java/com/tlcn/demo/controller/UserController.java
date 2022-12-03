@@ -122,4 +122,12 @@ public class UserController {
         return ResponseEntity.ok().body(new ResponseDTO(true,"Success",
                 users));
     }
+    @PostMapping("/user/follow")
+    public ResponseEntity<?> followUser(@RequestParam Long userFollowedId){
+
+        NotificationPayload notificationPayload = userService.followUser(userFollowedId);
+        return ResponseEntity.ok().body(new ResponseDTO(true,"Success",
+                notificationPayload));
+
+    }
 }

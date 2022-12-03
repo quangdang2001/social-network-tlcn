@@ -1,5 +1,6 @@
 package com.tlcn.demo.service;
 
+import com.tlcn.demo.controller.ws.Payload.NotificationPayload;
 import com.tlcn.demo.dto.LoginRequest;
 import com.tlcn.demo.dto.PersonalPage;
 import com.tlcn.demo.dto.UserDTO;
@@ -33,4 +34,5 @@ public interface UserService {
     boolean enableUser(String email);
     PersonalPage seePersonalPage(Long personalPageId);
     Set<Users> searchUser(String keyword);
+    NotificationPayload followUser(Long userFollowedId);
 }

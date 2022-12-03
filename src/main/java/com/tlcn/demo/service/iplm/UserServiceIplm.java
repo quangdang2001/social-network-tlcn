@@ -2,6 +2,7 @@ package com.tlcn.demo.service.iplm;
 
 import com.cloudinary.utils.ObjectUtils;
 
+import com.tlcn.demo.controller.ws.Payload.NotificationPayload;
 import com.tlcn.demo.dto.LoginRequest;
 import com.tlcn.demo.dto.PersonalPage;
 import com.tlcn.demo.dto.UserDTO;
@@ -312,6 +313,29 @@ public class UserServiceIplm implements UserService {
             users.addAll(userRepo.searchUserLastFirstName(keyword));
         }
         return users;
+    }
+
+    @Override
+    public NotificationPayload followUser(Long userFollowedId) {
+        Long userId = Utils.getIdCurrentUser();
+        Users users = findById(userId);
+        Users userFollowed = findById(userFollowedId);
+        UserFollowing checkFollow = userFollowingService.checkFollow(userId,userFollowedId);
+        NotificationPayload notificationPayload = null;
+        if (checkFollow == null) {
+            notificationPayload = userFollowingService.save(users,userFollowed);
+            users.setCountFollowing(users.getCountFollowing()+1);
+            userFollowed.setCountFollower(userFollowed.getCountFollower()+1);
+            save(users);
+            save(userFollowed);
+        }else {
+            userFollowingService.delete(users,userFollowed);
+            users.setCountFollowing(users.getCountFollowing()-1);
+            userFollowed.setCountFollower(userFollowed.getCountFollower()-1);
+            save(users);
+            save(userFollowed);
+        }
+        return notificationPayload;
     }
 
 }
