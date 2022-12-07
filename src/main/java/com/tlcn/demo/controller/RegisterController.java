@@ -14,6 +14,7 @@ import com.tlcn.demo.model.Users;
 import com.tlcn.demo.model.VerificationToken;
 import com.tlcn.demo.service.UserService;
 import com.tlcn.demo.service.notification.EmailSenderService;
+import com.tlcn.demo.util.EmailTemplate;
 import com.tlcn.demo.util.Utils;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
@@ -63,7 +64,7 @@ public class RegisterController {
                         + "&token="+
                         token;
         log.info("Active url: {}",url);
-        emailSenderService.sendEmail(users.getEmail(), url,"Verify Registration Email");
+        emailSenderService.sendEmail(users.getEmail(), EmailTemplate.emailRegister(url),"Verify Registration Email");
         return ResponseEntity.ok(new ResponseDTO(true,"Sent email",
                 null));
     }
@@ -72,9 +73,9 @@ public class RegisterController {
     public RedirectView verifyRegistration(@RequestParam("email") String email, @RequestParam("token") String token) {
         String result = userService.validateVerificationToken(email,token);
         if(result.equalsIgnoreCase("valid")) {
-            return new RedirectView("https://www.qpnetwork.tk/confirmemailqpnetwork");
+            return new RedirectView("https://social-network-ver2.vercel.app/confirmemailqpnetwork");
         }
-        return new RedirectView("https://www.qpnetwork.tk/confirmemailfailed");
+        return new RedirectView("https://social-network-ver2.vercel.app/confirmemailfailed");
     }
 
     @GetMapping("/resendVerifyToken")
@@ -96,7 +97,7 @@ public class RegisterController {
             token = userService.SendToken(passwordDTO.getEmail()).getToken();
 
             //Send email
-            emailSenderService.sendEmail(user.getEmail(),token,"Reset Password Token");
+            emailSenderService.sendEmail(user.getEmail(),EmailTemplate.emailToken(token),"Reset Password Token");
             log.info("Reset password: {}",
                     token);
             return ResponseEntity.ok(new ResponseDTO(true,"Sent email reset token",
