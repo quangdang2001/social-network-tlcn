@@ -35,4 +35,5 @@ public interface UserService {
     PersonalPage seePersonalPage(Long personalPageId);
     Set<Users> searchUser(String keyword);
     NotificationPayload followUser(Long userFollowedId);
+    Boolean reportUser(Long userId);
 }

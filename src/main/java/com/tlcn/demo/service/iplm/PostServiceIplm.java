@@ -228,6 +228,19 @@ public class PostServiceIplm implements PostService {
         return null;
     }
 
+    @Override
+    public Boolean reportPost(Long postId) {
+        Post post = findPostById(postId);
+        if (post != null) {
+            post.increaseReport();
+            if (post.getCountReported() > 50) {
+                postRepo.deleteById(postId);
+            }
+            return true;
+        }
+        return false;
+    }
+
     private PostDTO convertPostToPostDTO(Post post, Users user) {
         PostDTO postDTO = new PostDTO(post.getId(), post.getContent(), post.getUsers().getId(),
                 post.getCountLiked(), post.getCountCmted(), post.getCountShated(), post.getCountReported(),

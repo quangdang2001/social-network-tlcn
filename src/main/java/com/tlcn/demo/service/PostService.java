@@ -25,4 +25,5 @@ public interface PostService {
     List<Post> findPostReported();
     JSONArray getPostAdmin(int page, int size);
     NotificationPayload sharePost(PostDTO postDTO);
+    Boolean reportPost(Long postId);
 }

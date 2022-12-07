@@ -338,4 +338,14 @@ public class UserServiceIplm implements UserService {
         return notificationPayload;
     }
 
+    @Override
+    public Boolean reportUser(Long userId) {
+        Users users = findById(userId);
+        if (users!= null){
+            users.setCountReport(users.getCountReport()+1);
+            return true;
+        }
+        return false;
+    }
+
 }
