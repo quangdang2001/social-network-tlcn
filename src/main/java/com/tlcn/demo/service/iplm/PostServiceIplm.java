@@ -7,10 +7,7 @@ import com.tlcn.demo.dto.PostReq;
 import com.tlcn.demo.dto.PostShareDTO;
 import com.tlcn.demo.dto.UserDTO;
 import com.tlcn.demo.model.*;
-import com.tlcn.demo.repository.ImagePostRepo;
-import com.tlcn.demo.repository.PostLikeRepo;
-import com.tlcn.demo.repository.PostRepo;
-import com.tlcn.demo.repository.UserRepo;
+import com.tlcn.demo.repository.*;
 import com.tlcn.demo.service.Cloudinary.CloudinaryUpload;
 import com.tlcn.demo.service.NotificationService;
 import com.tlcn.demo.service.PostService;
@@ -31,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +43,9 @@ public class PostServiceIplm implements PostService {
     private final UserRepo userRepo;
     private final UserFollowingService userFollowingService;
     private final NotificationService notificationService;
+    private final HashtagRepo hashtagRepo;
+    private final HashPostRepo hashPostRepo;
+
     @Override
     public Post save(Post post) {
         return postRepo.save(post);
@@ -84,7 +85,6 @@ public class PostServiceIplm implements PostService {
     @Override
     public Post saveNewPost(PostReq postReq, Long userId) {
         Users usersProxy = userRepo.getById(userId);
-
         Post post = null;
         if (usersProxy.isEnable()) {
             post = new Post();
@@ -93,7 +93,33 @@ public class PostServiceIplm implements PostService {
             post.setPostShared(null);
             postRepo.save(post);
         }
+        Post finalPost = post;
+        var hashtags = getHashtag(postReq.getContent()).stream()
+                .map((hashtag) -> {
+                    if (hashtagRepo.existsByHashtag(hashtag)) {
+                        Hashtag hashtag1 = hashtagRepo.findHashtagByHashtag(hashtag);
+                        return hashPostRepo.save(new HashPost(finalPost, hashtag1));
+                    }
+                    else{
+                        return hashPostRepo.save(new HashPost(finalPost, hashtagRepo.save(new Hashtag(hashtag))));
+                    }
+                }).collect(Collectors.toList());
         return post;
+    }
+
+    private List<String> getHashtag(String content){
+        content = content + " ";
+        var hashtags = new ArrayList<String>();
+        while (true){
+            int index = content.indexOf("#");
+            if (index==-1)
+                break;
+            int lastIndex = content.indexOf(" ",index);
+            String hashtag = content.substring(index+1,lastIndex);
+            hashtags.add(hashtag);
+            content = content.replaceAll("#"+hashtag,"");
+        }
+        return hashtags;
     }
 
     @Override
@@ -239,6 +265,21 @@ public class PostServiceIplm implements PostService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Post updatePost(PostDTO postDTO) {
+        Post postProxy = postRepo.getById(postDTO.getId());
+        postProxy.setContent(postDTO.getContent());
+        save(postProxy);
+        return postProxy;
+    }
+
+    @Override
+    public List<PostDTO> findPostByHashtag(String hashtag, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<Post> posts = hashPostRepo.searchPostByHashtag(hashtag);
+        return convertPostsToPostDTOs(posts, userRepo.findById(Utils.getIdCurrentUser()).get());
     }
 
     private PostDTO convertPostToPostDTO(Post post, Users user) {

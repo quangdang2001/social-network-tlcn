@@ -15,10 +15,6 @@ import java.util.List;
 public interface MessageRepo extends JpaRepository<Message, Long> {
     List<Message> findBySender_IdAndReceiver_IdOrderByCreateTimeDesc(Long senderId, Long receiverId, Pageable pageable);
     List<Message> findAllByRoomOrderByCreateTimeDesc(String room, Pageable pageable);
-    @Query("select distinct m.sender,m.receiver,m.createTime from Message m where m.sender.id = :id or m.receiver.id = :id order by m.createTime desc")
-    List<Users> findSenderChat(Long id, Pageable pageable);
-    @Query("select distinct m.receiver,m.sender, m.createTime from Message m where m.sender.id = :id or m.receiver.id = :id order by m.createTime desc")
-    List<Users> findReceiverChat(Long id, Pageable pageable);
 
     @Query(value = "SELECT RECEIVER_ID AS receiverId, MAX(CREATE_TIME) AS createTime\n" +
             "FROM MESSAGE WHERE SENDER_ID = :senderId\n" +

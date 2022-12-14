@@ -26,4 +26,6 @@ public interface PostService {
     JSONArray getPostAdmin(int page, int size);
     NotificationPayload sharePost(PostDTO postDTO);
     Boolean reportPost(Long postId);
+    Post updatePost(PostDTO postDTO);
+    List<PostDTO> findPostByHashtag(String hashtag, int page, int size);
 }

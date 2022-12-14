@@ -68,6 +68,10 @@ public class Post {
     @OneToMany(mappedBy = "postId",cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<PostLike> postLikes;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "postId")
+    private List<HashPost> hashPosts;
+
     @PreRemove
     public void setNull(){
         postChild.forEach(post -> {

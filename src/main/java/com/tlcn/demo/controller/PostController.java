@@ -36,7 +36,11 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseDTO(true,"Success",
                 postDTO));
     }
-
+    @PutMapping("/post")
+    public ResponseEntity<?> updatePost(@RequestBody PostDTO postDTO){
+        Post post = postService.updatePost(postDTO);
+        return ResponseEntity.ok(new ResponseDTO(true,"Update successfully",post));
+    }
     @PostMapping(path = "/post")
     public ResponseEntity<?> savePost(@RequestBody PostReq postReq)  {
         Long userId = Utils.getIdCurrentUser();
@@ -101,6 +105,15 @@ public class PostController {
         else{
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseDTO(true, "Success", null));
         }
+    }
+
+    @GetMapping("/search/post/hashtag")
+    public ResponseEntity<?> searchPostByhashtag(@RequestParam String hashtag,
+                                                 @RequestParam(defaultValue = "0") int page,
+                                                 @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseDTO(true, "Success",
+                        postService.findPostByHashtag(hashtag, page, size)));
     }
 
 }
